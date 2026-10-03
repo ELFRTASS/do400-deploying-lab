@@ -3,7 +3,6 @@ pipeline {
     agent {
         node {
             label 'maven'
-            serviceAccount 'jenkins'
         }
     }
 
