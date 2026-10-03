@@ -3,6 +3,7 @@ pipeline {
     agent {
         node {
             label 'maven'
+            serviceAccount 'jenkins'
         }
     }
 
@@ -32,6 +33,29 @@ pipeline {
                     -Dquarkus.container-image.tag=build-$BUILD_NUMBER \
                     -Dquarkus.container-image.additional-tags=latest \
                     -Dquarkus.container-image.push=true
+                '''
+            }
+        }
+        // Download oc for use in the deployment stage.
+        stage('Download oc tool') {
+            steps {
+                sh '''
+                    curl -L \
+                        https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz \
+                        -o oc.tar.gz
+                    tar -xvf oc.tar.gz
+                    chmod +x oc
+                '''
+            }
+        }
+        // Deploy the image built for this Jenkins run to the test environment.
+        stage('Deploy to Test') {
+            steps {
+                sh '''
+                    export PATH="$PATH:$WORKSPACE"
+                    oc set image deployment/home-automation \
+                        home-automation=quay.io/$QUAY_USR/do400-deploying-lab:build-$BUILD_NUMBER \
+                        -n igalrq-deploying-lab-test --record
                 '''
             }
         }
