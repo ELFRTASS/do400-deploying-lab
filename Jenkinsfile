@@ -1,8 +1,9 @@
 /* groovylint-disable-next-line CompileStatic */
 pipeline {
     agent {
-        node {
-            label 'maven'
+        kubernetes {
+            inheritFrom 'maven'
+            serviceAccount 'jenkins'
         }
     }
 
