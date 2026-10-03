@@ -1,9 +1,8 @@
 /* groovylint-disable-next-line CompileStatic */
 pipeline {
     agent {
-        kubernetes {
-            inheritFrom 'maven-agent'
-            defaultContainer 'maven'
+        node {
+            label 'maven'
         }
     }
 
